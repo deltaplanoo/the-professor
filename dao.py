@@ -32,8 +32,8 @@ def create_cards_table():
                 CREATE TABLE IF NOT EXISTS cards (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL UNIQUE,
-                    rarity INTEGER NOT NULL
-                    path INTEGER NOT NULL UNIQUE,
+                    rarity INTEGER NOT NULL,
+                    path INTEGER NOT NULL UNIQUE
                 )
             """)
             conn.commit()

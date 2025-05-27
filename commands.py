@@ -1,8 +1,6 @@
 from typing import Optional
-import discord
-import dao
 import logic
-from datetime import datetime
+import discord
 
 daily_coins = 50
 

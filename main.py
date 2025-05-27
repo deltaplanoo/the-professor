@@ -11,9 +11,10 @@ def main():
   """
   Main function to run the bot.
   """
-  # Init db
+  # Init DBs
   dao.create_users_table()
-  
+  dao.create_cards_table()
+
   commands.client.run(token)
 
 if __name__ == "__main__":
