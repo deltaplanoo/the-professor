@@ -1,6 +1,5 @@
 import commands
 import dao
-import asyncio
 import json
 
 with open('secrets.json') as f:
