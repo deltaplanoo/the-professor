@@ -12,7 +12,7 @@ class ForestSessionView(discord.ui.View):
 
         # Add the button directly. The custom_id is made unique by embedding the message ID.
         self.add_item(discord.ui.Button(
-            label="Join Session", 
+            label="I'm in!", 
             style=discord.ButtonStyle.green, 
             custom_id=f"join_forest_session_{self.session_message_id}" # This MUST be unique!
         ))

@@ -20,8 +20,7 @@ async def on_message(message):
   if message.author == client.user:
     return
 
-  if (message.content.startswith('!daily') or
-      message.content.startswith('!redeem') or
+  if (message.content.startswith('!redeem') or
       message.content.startswith('!claim')):
     username = message.author.name
     await logic.register(username, message)
@@ -34,9 +33,10 @@ async def on_message(message):
     await logic.check_balance(username, message)
   
   if message.content.startswith('!help'):
-    await message.channel.send(
+    await message.reply(
 '''
-- `!daily` - Redeem your daily coins (aliases: `!redeem`)
+Here are the available commands:
+- `!redeem` - Redeem your coins (aliases: `!claim`)
 - `!balance` - Check your balance
 - `!help` - Show this message
 - `!gamble <amount>` - Gamble your coins (aliases: `!bet`, `!roll`)
