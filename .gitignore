@@ -4,3 +4,4 @@ assets
 users.db
 uv.lock
 secrets.json
+.venv
