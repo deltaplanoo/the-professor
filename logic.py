@@ -2,7 +2,8 @@ import dao, button
 from datetime import datetime
 import math, discord, random, re
 
-daily_coins = 50
+redeem_coins = 50
+threshold = 3 * 60 * 60  # 3 hours
 
 def extract_info(text_string):
     """
@@ -42,7 +43,7 @@ async def register(username, message):
 async def redeem(username, message):
   balance = dao.get_user_balance(username)
   if isinstance(balance, int):
-    balance += daily_coins
+    balance += redeem_coins
     dao.set_user_balance(username, balance)
     await message.channel.send(f'{message.author.mention} you received your daily coins! Your new balance is {balance}.')
     dao.set_last_redeem(username, datetime.now().isoformat())
@@ -55,10 +56,10 @@ async def redeem_eligibility(username, message) -> bool:
   else:
     elapsed_time = datetime.now() - datetime.fromisoformat(last_redeem)
     print(elapsed_time.total_seconds())
-    if elapsed_time.total_seconds() >= 24 * 60 * 60:  # elapsed >= 24h -> redeem
+    if elapsed_time.total_seconds() >= threshold:  # elapsed >= threshold -> redeem
       return True
     else:
-      remaining = (24 * 60 * 60 - elapsed_time.total_seconds()) / 60
+      remaining = (threshold - elapsed_time.total_seconds()) / 60
       if remaining > 60:
         remaining = remaining / 60
         await message.channel.send(f'{message.author.mention} you have already redeemed your daily coins today. Please try again in {math.floor(remaining)} hours.')
