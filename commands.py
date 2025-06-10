@@ -47,7 +47,7 @@ Here are the available commands:
     message.content.startswith('!roll')):
     await logic.gamble(message)
 
-  if "69" in message.content and message.channel == "🔢-counting" and not message.content.startswith("http"):
+  if "69" in message.content and not message.content.startswith("http"):
     await message.add_reaction('😍')
 
   if message.content.startswith('!buy'):

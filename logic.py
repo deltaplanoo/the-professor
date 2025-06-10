@@ -1,7 +1,8 @@
-import dao, button
+import dao, button, os
 from datetime import datetime
-import math, discord, random, re
+import math, discord, random, re, time, qrcode
 
+# Constants
 redeem_coins = 50
 threshold = 3 * 60 * 60  # 3 hours
 
@@ -76,6 +77,7 @@ async def check_balance(username, message):
     await register(username, message)
 
 async def gamble(message):
+  start = time.perf_counter()
   username = message.author.name
   balance = dao.get_user_balance(username)
   amount = re.findall(r'\d+', message.content)
@@ -96,6 +98,9 @@ async def gamble(message):
         dao.set_user_balance(username, balance + amount)
   except IndexError as e:
     await message.channel.send(f"{message.author.mention} you need to specify an amount to gamble.")
+  end = time.perf_counter()
+  elapsed = end - start
+  print(f"{username}, !bet: {elapsed:.2f} sec")
 
 async def give(message):
   username = message.author.name
@@ -121,7 +126,7 @@ async def buy(message):
   embed.set_image(url="https://cardotaku.com/cdn/shop/files/ex-card-4.png")
   await message.reply(embed=embed)
 
-# FIXME: ping forest role!!!
+# FIXME: ping forest role!!!.
 async def forest(message):
   token = message.content.split("token=")[-1]
   if token:
@@ -131,25 +136,44 @@ async def forest(message):
       return
     title = f"🌲 Forest session 🌲"
     embed = discord.Embed(title=title, description=f"Created by {message.author.mention}", colour=discord.Colour.green())
-    embed.url = f"https://www.forestapp.cc/join-room?token={token}"
+    url = f"https://www.forestapp.cc/join-room?token={token}"
+    embed.url = url
     embed.set_thumbnail(url="https://www.forestapp.cc/img/icon.png")
-    channel = message.channel
     forest_role = message.guild.get_role(1366696611216097281)
     
     embed.add_field(name="🌲Tree", value=tree_name)
     embed.add_field(name="⏳Time", value=f"{length} minutes")
     embed.add_field(name="🔑Token", value=f"`{token}`")
+    
+    img = qrcode.make(url)
+    img = img.resize((150, 150))
+    
+    img.save(f"{token}.png", format="PNG")
+    file = discord.File(f"{token}.png", filename=f"{token}.png")
+    #FIXME: delete image after session starts
 
     initial_joined_count = 1
     embed.set_footer(text=f"Users in session: {initial_joined_count}")
 
     await message.delete()
-    sent_message = await message.channel.send(embed=embed)
-    view = button.ForestSessionView(initial_creator=message.author, session_message_id=sent_message.id)
+    await message.channel.send(f"{forest_role.mention} new forest session available! Join now!", file=file)
+    os.remove(f"{token}.png")
+    view = button.ForestSessionView(initial_creator=message.author, session_message_id=0)
+    sent_message = await message.channel.send(embed=embed, view=view)
+
+    # IMPORTANT: Now that the message is sent, update the view's session_message_id
+    # and then edit the message to reflect the correct custom_ids for persistence.
+    view.session_message_id = sent_message.id
+    
+    # Update custom_ids on the buttons within the view instance
     for item in view.children:
-      if isinstance(item, discord.ui.Button) and item.custom_id.startswith("join_forest_session_"):
-        item.callback = view.handle_join_button_click
-        break
+        if isinstance(item, discord.ui.Button):
+            if item.custom_id.startswith("join_forest_session_"):
+                item.custom_id = f"join_forest_session_{sent_message.id}"
+            elif item.custom_id.startswith("start_forest_session_"):
+                item.custom_id = f"start_forest_session_{sent_message.id}"
+
+    # Re-edit the message with the updated view (containing correct custom_ids)
     await sent_message.edit(view=view)
 
   else:
