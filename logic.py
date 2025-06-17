@@ -63,7 +63,7 @@ async def redeem_eligibility(username, message) -> bool:
       remaining = (threshold - elapsed_time.total_seconds()) / 60
       if remaining > 60:
         remaining = remaining / 60
-        await message.channel.send(f'{message.author.mention} you have already redeemed your daily coins today. Please try again in {math.floor(remaining)} hours.')
+        await message.channel.send(f'{message.author.mention} you have already redeemed your daily coins today. Please try again in {math.floor(remaining)} h and {math.floor((remaining - math.floor(remaining))*60)} min.')
         return False
       else:
         await message.channel.send(f'{message.author.mention} you have already redeemed your daily coins today. Please try again in {math.floor(remaining)} minutes.')
