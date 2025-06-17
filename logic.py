@@ -1,4 +1,4 @@
-import dao, button, os
+import dao, os
 from datetime import datetime
 import math, discord, random, re, time, qrcode
 
@@ -152,29 +152,12 @@ async def forest(message):
     file = discord.File(f"{token}.png", filename=f"{token}.png")
     #FIXME: delete image after session starts
 
-    initial_joined_count = 1
-    embed.set_footer(text=f"Users in session: {initial_joined_count}")
-
     await message.delete()
-    await message.channel.send(f"{forest_role.mention} new forest session available! Join now!", file=file)
+    await message.channel.send(f"New {forest_role.mention} session available! Join now!", file=file)
+    sent_message = await message.channel.send(embed=embed)
+    await sent_message.add_reaction('🌲')
     os.remove(f"{token}.png")
-    view = button.ForestSessionView(initial_creator=message.author, session_message_id=0)
-    sent_message = await message.channel.send(embed=embed, view=view)
 
-    # IMPORTANT: Now that the message is sent, update the view's session_message_id
-    # and then edit the message to reflect the correct custom_ids for persistence.
-    view.session_message_id = sent_message.id
-    
-    # Update custom_ids on the buttons within the view instance
-    for item in view.children:
-        if isinstance(item, discord.ui.Button):
-            if item.custom_id.startswith("join_forest_session_"):
-                item.custom_id = f"join_forest_session_{sent_message.id}"
-            elif item.custom_id.startswith("start_forest_session_"):
-                item.custom_id = f"start_forest_session_{sent_message.id}"
-
-    # Re-edit the message with the updated view (containing correct custom_ids)
-    await sent_message.edit(view=view)
 
   else:
     await message.reply(f"The token you provided is invalid. Please provide a valid token.")
