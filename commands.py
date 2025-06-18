@@ -38,8 +38,9 @@ async def on_message(message):
 Here are the available commands:
 - `!redeem` - Redeem your coins (aliases: `!claim`)
 - `!balance` - Check your balance
-- `!help` - Show this message
 - `!gamble <amount>` - Gamble your coins (aliases: `!bet`, `!roll`)
+- `!send @receiver <amount>` - Send coins to another user
+- `!help` - Show this message
 ''')
 
   if (message.content.startswith('!gamble') or
@@ -58,3 +59,6 @@ Here are the available commands:
 
   if "forestapp.cc/join-room?token=" in message.content:
     await logic.forest(message)
+
+  if message.content.startswith('!send'):
+    await logic.send(message)

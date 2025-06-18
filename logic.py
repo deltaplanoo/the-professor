@@ -161,3 +161,52 @@ async def forest(message):
 
   else:
     await message.reply(f"The token you provided is invalid. Please provide a valid token.")
+
+async def send(message):
+  sender = message.author.name
+  sender_balance = dao.get_user_balance(sender)
+  #parse the command: !send @receiver <amount>
+  parts = message.content.split()
+  
+  if len(parts) != 3:
+    await message.reply("Usage: `!send @receiver <amount>`")
+    return
+
+  command, receiver_mention, amount_str = parts
+
+  # 2. Validate receiver mention
+  # check if mentioned user is already registered
+  if len(message.mentions) == 0:
+    await message.reply("You need to mention a user to send coins to, like this -> `!send @receiver <amount>`")
+    return
+  receiver = message.mentions[0].name
+  if sender == receiver:
+    await message.reply("You cannot send coins to yourself dumbass!")
+    return
+  receiver_balance = dao.get_user_balance(receiver)
+  if receiver_balance is None:
+    await message.reply(f"That bitch is not registered yet. Please ask them to register by redeeming their first coins with `!redeem`.")
+    return
+  
+  # 3. Validate amount
+  try:
+    amount = int(amount_str)
+    if amount <= 0:
+      await message.reply("Amount must be a positive number.")
+      return
+  except ValueError:
+    await message.reply("Invalid amount. Please provide a number.")
+    return
+
+  # 4. Check if sender has enough money
+  if sender_balance < amount:
+    await message.reply(f"You only have {sender_balance} coins, which is not enough to send {amount}.")
+    return
+
+  # 5. Perform the transfer
+  # Decrement sender's balance
+  dao.set_user_balance(sender, sender_balance - amount)
+  dao.set_user_balance(receiver, receiver_balance + amount)
+  
+  # 6. Confirmation message
+  await message.reply(f"You sent {amount} coins to {receiver_mention}. Yyour new balance is {sender_balance - amount}!")
