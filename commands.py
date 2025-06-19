@@ -54,8 +54,8 @@ Here are the available commands:
   if message.content.startswith('!buy'):
     await logic.buy(message)
 
-  if message.content.startswith('!give'):
-    await logic.give(message)
+  #if message.content.startswith('!give'):
+  #  await logic.give(message)
 
   if "forestapp.cc/join-room?token=" in message.content:
     await logic.forest(message)

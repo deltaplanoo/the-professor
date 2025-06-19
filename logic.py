@@ -209,4 +209,4 @@ async def send(message):
   dao.set_user_balance(receiver, receiver_balance + amount)
   
   # 6. Confirmation message
-  await message.reply(f"You sent {amount} coins to {receiver_mention}. Yyour new balance is {sender_balance - amount}!")
+  await message.reply(f"You sent {amount} coins to {receiver_mention}. Your new balance is {sender_balance - amount}!")
